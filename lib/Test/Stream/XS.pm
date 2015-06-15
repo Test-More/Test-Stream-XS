@@ -62,7 +62,17 @@ Test::Stream::XS - XS Enhancement library for L<Test::Stream>
 
 =head1 DESCRIPTION
 
-TODO
+This module exports XS variations of several key subs in the L<Test::Stream>
+tools. This module provides significant performance enhancements.
+
+=head1 SYNOPSYS
+
+B<Just install it.> Test::Stream will automatically use Test::Stream::XS for
+you if it is installed.
+
+    use Test::Stream;
+
+    ... XS used automatically if installed ...
 
 =head1 CONVENTIONS
 
@@ -89,7 +99,104 @@ test the C code directly.
 
 =head1 EXPORTS
 
-TODO
+=head2 GENERAL
+
+=over 4
+
+=item $count = refcount($ref)
+
+This will get the refcount of the item the argument ref is pointing at. This
+will throw an exception if the item you pass in is not a reference.
+
+=item $frame = test_caller($level, $wrap, $fudge)
+
+This is used internally to find the stack frame to which errors should be
+reported. It will return an arrayref with the C<PACKAGE>, C<FILE>, C<LINE>,
+C<SUBNAME>, and C<DEPTH>.
+
+This is not typically useful outside of the C<context()> function. It is
+provided specifically for tools that want to emulate C<context()> without
+directly using it.
+
+=item noop()
+
+This is an empty xsub, it takes no arguments, and returns nothing. This is for
+use in base classes that have empty subs that get called when subclasses do not
+override them. It is suprising what kind of a speed boost this can bring.
+
+Instead of:
+
+    sub foo {   }
+
+do:
+
+    *foo = \&Test::Stream::XS::noop;
+
+B<Note> In some cases you will need to wrap the above in C<BEGIN { ... }> for
+it to work properly.
+
+=back
+
+=head2 Test::Stream::Context
+
+=over 4
+
+=item $ctx = context_xs(%PARAMS)
+
+See L<Test::Stream::Context> for details, this xsub takes the place of the
+usual C<context()> function. All arguments to the pure-perl version are also
+accepted by the XS version.
+
+=item $ctx->release_xs
+
+See L<Test::Stream::Context> for details, this xsub takes the place of the
+usual C<release()> method.
+
+=back
+
+=head2 Test::Stream::Hub
+
+=over 4
+
+=item $hid = hid_xs($hub)
+
+Get the hid string from an instance of L<Test::Stream::Hub>. This replaces the
+normal C<hid> accessor.
+
+=item $todo = get_todo_xs($hub)
+
+Get the TODO string from an instance of L<Test::Stream::Hub>. This replaces the
+normal C<get_todo> accessor. TODO is a stack, and this method can be slow since
+it also cleans up empty entries from the stack, the XS version is notably
+faster.
+
+=back
+
+=head2 Test::Stream::Stack
+
+=over 4
+
+=item $hub = top_xs($stack)
+
+Replaces the C<top> accessor in L<Test::Stream::Stack>.
+
+=item $hub = peek_xs($stack)
+
+Replaces the C<peek> accessor in L<Test::Stream::Stack>.
+
+=back
+
+=head2 Test::Stream::Util
+
+=over 4
+
+=item $tid = get_tid_xs()
+
+Get the current threads id. This will check if threads are loaded, if they are
+it will return the current thread id. If threads are not loaded this will
+return 0.
+
+=back
 
 =head1 AUTHORS
 

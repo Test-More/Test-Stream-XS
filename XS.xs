@@ -110,7 +110,7 @@ SV *trace(I32 level, I32 wrap, I32 fudge, I32 *depth) {
         }
         else {
             last = idx;
-            if (lastname) SvREFCNT_dec_NN(lastname);
+            if (lastname) SvREFCNT_dec(lastname);
             lastname = subname;
         }
     }
@@ -128,7 +128,7 @@ SV *trace(I32 level, I32 wrap, I32 fudge, I32 *depth) {
         name = lastname;
     }
     else if(lastname) {
-        SvREFCNT_dec_NN(lastname);
+        SvREFCNT_dec(lastname);
     }
 
     if (found < 0) return newSV(0);
@@ -148,7 +148,7 @@ SV *trace(I32 level, I32 wrap, I32 fudge, I32 *depth) {
 
 // {{{ Hook Related
 void run_hooks(SV *ctx, I32 reverse, AV *hooks) {
-    I32 top = av_top_index(hooks);
+    I32 top = av_len(hooks);
     if (top == -1) return;
 
     I32 i;
@@ -186,7 +186,7 @@ SV *get_todo_xs(SV *hub) {
     SV *todos = *todos_p;
 
     AV *todos_a = (AV*)SvRV(todos);
-    I32 top = av_top_index(todos_a);
+    I32 top = av_len(todos_a);
 
     if(top == -1) return out;
 
@@ -222,7 +222,7 @@ SV *hid_xs(SV *hub) {
 // {{{ Hub Stack related
 SV *stack_peek(SV *stack_r) {
     AV *stack = (AV*)SvRV(stack_r);
-    I32 top = av_top_index(stack);
+    I32 top = av_len(stack);
     if (top >= 0) {
         SV **hub = av_fetch(stack, top, 0);
         if (hub && SvOK(*hub)) return *hub;
