@@ -54,6 +54,7 @@ I32 get_tid_xs() {
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvn("threads", 7)));
     PUTBACK;
     int count = call_pv("threads::tid", G_SCALAR);
     SPAGAIN;

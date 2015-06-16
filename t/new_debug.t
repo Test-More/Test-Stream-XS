@@ -28,12 +28,16 @@ is($dbg->tid, 0, "Correct tid");
 is($dbg->todo, "foo", "is todo");
 ok($dbg->parent_todo, "parent todo");
 
+$todo = undef;
+
 if (eval { require threads; 1}) {
     my $tid = threads->tid;
     threads->create(sub {
         my $dbg = _test_new_debuginfo($hub, $frame);
+        my $xtid = Test::Stream::XS::get_tid_xs;
         ok($dbg->tid != $tid, "Different thread id");
     })->join;
 }
+
 
 done_testing;

@@ -6,7 +6,8 @@ use Scalar::Util qw/weaken isweak/;
 
 like(dies { refcount("") }, qr/Not a reference/, "Must use a ref");
 
-is(refcount({}), 1, "1 ref");
+my $one = {};
+is(refcount($one), 1, "1 ref");
 
 my $x = {};
 is(refcount($x), 1, "1 ref");
